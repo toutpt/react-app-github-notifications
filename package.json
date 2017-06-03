@@ -16,7 +16,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "PUBLIC_URL=https://toutpt.github.io/react-app-github-notifications && react-scripts build",
+    "docs": "rm -rf docs && yarn run build && mv build docs && ./docs.sh",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
