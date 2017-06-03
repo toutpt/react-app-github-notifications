@@ -1,2 +1,2 @@
 # /bin/bash
-sed -i -- 's/\/static\//https:\/\/toutpt\.github\.io\/react-app-github-notifications\/static/g' ./docs/index.html
+sed -i -- 's/\/static\//https:\/\/toutpt\.github\.io\/react-app-github-notifications\/static\//g' ./docs/index.html
