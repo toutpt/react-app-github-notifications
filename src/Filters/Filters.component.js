@@ -1,6 +1,9 @@
 import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
+import FilterFetch from './FilterFetch';
+import FilterReason from './FilterReason';
+import FilterType from './FilterType';
 import notifications from '../notifications';
-import Action from '../Action';
 
 class Filters extends React.Component {
 	static propTypes = {
@@ -9,89 +12,32 @@ class Filters extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.onSubmit = this.onSubmit.bind(this);
-		this.onChange = this.onChange.bind(this);
-		this.state = {};
-	}
-
-	onSubmit(event) {
-		this.props.onSubmit();
-	}
-
-	onChange(event) {
-		const target = event.target;
-		const value = target.type === 'checkbox' ? target.checked : target.value;
-		const name = target.name;
-
-		this.setState({
-			[name]: value
-		});
-		const newFilter = Object.assign({}, this.state, {
-			[name]: value
-		});
-		notifications.filter.set(newFilter);
-		if (name === 'all' || name === 'participating') {
-			this.onSubmit();
-		}
 	}
 
 	render() {
-		const filter = notifications.filter.get();
+		const filter = this.props.filter || {};
+		const reason = this.props.reason || {};
+		const type = this.props.type || {};
 		return (
-			<div className="panel panel-default">
-				<div className="panel-heading">Filters</div>
-				<div className="panel-body">
-					<form onSubmit={this.onSubmit}>
-						<div className="checkbox">
-							<label>
-								<input
-									name="all"
-									type="checkbox"
-									onChange={this.onChange}
-									checked={filter.all}
-								/>
-								All
-							</label>
-						</div>
-						<div className="checkbox">
-							<label>
-								<input
-									name="participating"
-									type="checkbox"
-									onChange={this.onChange}
-									checked={filter.participating}
-								/>
-								Participating
-							</label>
-						</div>
-						<div className="form-group">
-							<label>Since</label>
-							<input
-								type="text"
-								name="since"
-								className="form-control"
-								placeholder="YYYY-MM-DDTHH:MM:SSZ"
-								onChange={this.onChange}
-								value={filter.since}
-							/>
-						</div>
-						<div className="form-group">
-							<label>Before</label>
-							<input
-								type="text"
-								name="before"
-								className="form-control"
-								placeholder="YYYY-MM-DDTHH:MM:SSZ"
-								onChange={this.onChange}
-								value={filter.before}
-							/>
-						</div>
-						<Action onClick={this.onSubmit} className="btn-primary">Submit</Action>
-					</form>
-				</div>
+			<div>
+				<FilterFetch filter={filter} dispatch={this.props.dispatch} />
+				<FilterType type={type} dispatch={this.props.dispatch} />
+				<FilterReason reason={reason} dispatch={this.props.dispatch}/>
 			</div>
 		);
 	}
 }
 
-export default Filters;
+function mapStateToProps(state) {
+	return {
+		filter: state.filter,
+		reason: state.reason,
+		type: state.type,
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return { dispatch };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Filters);

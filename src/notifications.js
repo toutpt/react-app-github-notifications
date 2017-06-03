@@ -19,27 +19,21 @@ function get() {
 	return [];
 }
 
-const filter = {};
-filter.get = function filterGet() {
-	return JSON.parse(localStorage.filters || '{}');
-}
-
-filter.set = function filterSet(filter) {
-	localStorage.setItem('filters', JSON.stringify(filter));
-}
-
-filter.getString = function filterGetString() {
-	const struct = filter.get();
+function filterToString(filter) {
 	let buff = '';
-	Object.keys(struct).forEach(k => {
-		buff += `${k}=${struct[k]}&`;
+	Object.keys(filter).forEach(k => {
+		buff += `${k}=${filter[k]}&`;
 	})
 	return buff
 }
 
-function fetchAll() {
+function fetchAll(filter) {
+	let filterString = '';
+	if (filter) {
+		filterString = filterToString(filter)
+	}
 	// https://api.github.com/notifications?access_token=XXX
-	return fetch(`https://api.github.com/notifications?access_token=${localStorage.token}&${filter.getString()}`)
+	return fetch(`https://api.github.com/notifications?access_token=${localStorage.token}&${filterString}`)
 	.then(handleResponse)
 	.then((data) => {
 		set(data);
@@ -47,9 +41,20 @@ function fetchAll() {
 	});
 }
 
+function markAsRead(id) {
+	let url = `https://api.github.com/notifications?access_token=${localStorage.token}`;
+	if (id) {
+		url = `https://api.github.com/notifications/threads/${id}?access_token=${localStorage.token}`;
+	}
+	return fetch(url, {method: 'PATCH'})
+		.then((data) => {
+			return data;
+		});
+}
+
 export default {
 	fetchAll,
+	markAsRead,
 	get,
 	set,
-	filter,
 };

@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Icon from '../Icon';
 
 class Action extends React.Component {
@@ -6,6 +7,7 @@ class Action extends React.Component {
 		name: PropTypes.string,
 		onClick: PropTypes.func,
 		icon: PropTypes.string,
+		actionCreator: PropTypes.func,
 	};
 
 	constructor(props) {
@@ -23,6 +25,11 @@ class Action extends React.Component {
 		if (this.props.href) {
 			aProps.href = this.props.href;
 		}
+		if (this.props.actionCreator) {
+			aProps.onClick = (event) => this.props.dispatch(
+				this.props.actionCreator(event, this.props)
+			);
+		}
 		const className = `btn ${this.props.className || 'btn-link'}`;
 		return (
 			<a className={className} {...aProps}>
@@ -34,4 +41,8 @@ class Action extends React.Component {
 	}
 }
 
-export default Action;
+function mapDispatchToProps(dispatch) {
+	return { dispatch };
+}
+
+export default connect(undefined, mapDispatchToProps)(Action);

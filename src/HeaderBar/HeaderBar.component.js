@@ -1,5 +1,10 @@
 import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
+import classnames from 'classnames'
 import token from '../token';
+import Action from '../Action';
+import Icon from '../Icon';
+import notifications from '../notifications';
 
 class HeaderBar extends React.Component {
 	static propTypes = {
@@ -10,6 +15,7 @@ class HeaderBar extends React.Component {
 		super(props);
 		this.onTokenChange = this.onTokenChange.bind(this);
 		this.onTokenSubmit = this.onTokenSubmit.bind(this);
+		this.refetch = this.refetch.bind(this);
 		this.state = {
 			token: token.get(),
 		};
@@ -26,6 +32,22 @@ class HeaderBar extends React.Component {
 		token.set(this.state.token);
 	}
 
+	refetch(event) {
+		let filter = this.props.filter || { all: true };
+		this.props.dispatch({
+			type: 'FETCH_NOTIFICATIONS',
+			filter,
+		});
+		notifications.fetchAll(filter)
+		.then((data) => {
+			this.props.dispatch({
+				type: 'NOTIFICATIONS_RESPONSE',
+				data,
+				filter,
+			});
+		});
+	}
+
 	render() {
 		return (
 			<nav className="navbar navbar-default">
@@ -38,7 +60,13 @@ class HeaderBar extends React.Component {
 					</button>
 					<a className="navbar-brand" href="#">Github Notifications</a>
 				</div>
-				<form className="navbar-form navbar-left" onSubmit={this.onTokenSubmit}>
+				<Action
+					className="btn-link navbar-btn"
+					onClick={this.refetch}
+				>
+					<Icon name="refresh" className={classnames({ 'fa-spin': this.props.fetching })} />
+				</Action>
+				<form className="navbar-form navbar-right" onSubmit={this.onTokenSubmit}>
 					<div className="form-group">
 						<input type="text" className="form-control" placeholder="token" onChange={this.onTokenChange} />
 					</div>
@@ -49,4 +77,15 @@ class HeaderBar extends React.Component {
 	}
 }
 
-export default HeaderBar;
+function mapStateToProps(state) {
+	return {
+		filter: state.filter,
+		fetching: state.fetching,
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return { dispatch };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(HeaderBar);

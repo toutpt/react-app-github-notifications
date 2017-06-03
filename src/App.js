@@ -27,10 +27,10 @@ class App extends Component {
 				<div className="container">
 					<HeaderBar />
 					<div className="row">
-						<div className="col-md-4">
+						<div className="col-md-3">
 							<Filters onSubmit={this.onSubmitFilter} />
 						</div>
-						<div className="col-md-8">
+						<div className="col-md-9">
 							<NotificationTable notifications={this.state.notifications} />
 						</div>
 					</div>
